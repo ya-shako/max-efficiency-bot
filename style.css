@@ -1,0 +1,300 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f5f5;
+    color: #333;
+}
+
+.app {
+    max-width: 100%;
+    min-height: 100vh;
+    background: white;
+}
+
+/* Навигация */
+.tabs {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: white;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tab-btn.active {
+    background: #4a76a8;
+    color: white;
+}
+
+/* Контент вкладок */
+.tab-content {
+    display: none;
+    padding: 16px;
+    min-height: calc(100vh - 49px);
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Чеклист */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.add-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: #4a76a8;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.task-form {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.task-form input,
+.task-form select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.form-actions button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#saveTaskBtn {
+    background: #4a76a8;
+    color: white;
+}
+
+#cancelTaskBtn {
+    background: #6c757d;
+    color: white;
+}
+
+.task-item {
+    background: white;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 4px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.task-item.important-urgent { border-left-color: #dc3545; }
+.task-item.important-not-urgent { border-left-color: #28a745; }
+.task-item.urgent-not-important { border-left-color: #ffc107; }
+.task-item.not-important-not-urgent { border-left-color: #6c757d; }
+
+.task-info {
+    flex: 1;
+}
+
+.task-text {
+    margin-bottom: 4px;
+}
+
+.task-deadline {
+    font-size: 12px;
+    color: #666;
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.complete-btn, .delete-btn {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.complete-btn {
+    background: #28a745;
+    color: white;
+}
+
+.delete-btn {
+    background: #dc3545;
+    color: white;
+}
+
+/* GTD */
+.gtd-container {
+    height: calc(100vh - 100px);
+    position: relative;
+}
+
+.gtd-quadrants {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+}
+
+.quadrant {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    text-align: center;
+    font-size: 12px;
+    border: 2px dashed #ddd;
+    transition: all 0.3s;
+}
+
+.quadrant.top-left {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: #dc3545;
+}
+
+.quadrant.top-right {
+    background: rgba(40, 167, 69, 0.1);
+    border-color: #28a745;
+}
+
+.quadrant.bottom-left {
+    background: rgba(255, 193, 7, 0.1);
+    border-color: #ffc107;
+}
+
+.quadrant.bottom-right {
+    background: rgba(108, 117, 125, 0.1);
+    border-color: #6c757d;
+}
+
+.current-task {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    min-width: 200px;
+    text-align: center;
+    z-index: 10;
+}
+
+.task-card {
+    font-size: 18px;
+    margin-bottom: 16px;
+}
+
+.swipe-hint {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+}
+
+/* Помодоро */
+.pomodoro-container {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.timer-display {
+    font-size: 48px;
+    font-weight: bold;
+    margin: 20px 0;
+    color: #333;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.timer-controls button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #4a76a8;
+    color: white;
+}
+
+.timer-controls button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.timer-settings {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.timer-settings label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 14px;
+}
+
+.timer-settings input {
+    width: 60px;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.pomodoro-stats {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
