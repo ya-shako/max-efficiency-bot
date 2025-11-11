@@ -8,12 +8,13 @@ class EfficiencyApp {
         this.isBreakTime = false;
         this.sessionsCount = 0;
 
-        this.init();
+        // Используем асинхронную инициализацию
+        this.initAsync();
     }
 
-    init() {
+    async initAsync() {
         console.log('🚀 App initialization started');
-        this.loadTasks();
+        await this.loadTasks();
         this.setupEventListeners();
         this.renderTasks();
         this.showNextUnprioritizedTask();
@@ -29,13 +30,20 @@ class EfficiencyApp {
     }
 
     // Хранение задач
-    loadTasks() {
+    async loadTasks() {
         try {
             let saved = null;
             
             if (window.WebApp && window.WebApp.DeviceStorage) {
-                // Для MAX Bridge
-                saved = window.WebApp.DeviceStorage.getItem('efficiency_tasks');
+                // Для MAX Bridge - получаем значение (может быть Promise)
+                const result = window.WebApp.DeviceStorage.getItem('efficiency_tasks');
+                
+                // Обрабатываем как Promise, если это Promise
+                if (result && typeof result.then === 'function') {
+                    saved = await result;
+                } else {
+                    saved = result;
+                }
                 console.log('📦 Loaded from MAX Storage:', saved);
             } else {
                 // Fallback для локального хранилища
@@ -43,7 +51,7 @@ class EfficiencyApp {
                 console.log('📦 Loaded from Local Storage:', saved);
             }
             
-            if (saved && saved !== 'null' && saved !== 'undefined') {
+            if (saved && saved !== 'null' && saved !== 'undefined' && saved !== '[object Promise]') {
                 this.tasks = JSON.parse(saved);
                 console.log('✅ Tasks loaded:', this.tasks.length);
             } else {
@@ -56,12 +64,17 @@ class EfficiencyApp {
         }
     }
 
-    saveTasks() {
+    async saveTasks() {
         try {
             const data = JSON.stringify(this.tasks);
             
             if (window.WebApp && window.WebApp.DeviceStorage) {
-                window.WebApp.DeviceStorage.setItem('efficiency_tasks', data);
+                const result = window.WebApp.DeviceStorage.setItem('efficiency_tasks', data);
+                
+                // Обрабатываем как Promise, если это Promise
+                if (result && typeof result.then === 'function') {
+                    await result;
+                }
                 console.log('💾 Saved to MAX Storage');
             } else {
                 localStorage.setItem('efficiency_tasks', data);
@@ -97,9 +110,9 @@ class EfficiencyApp {
         }
 
         if (saveTaskBtn) {
-            saveTaskBtn.addEventListener('click', () => {
+            saveTaskBtn.addEventListener('click', async () => {
                 console.log('🎯 Save task button clicked');
-                this.saveNewTask();
+                await this.saveNewTask();
             });
         }
 
@@ -197,7 +210,7 @@ class EfficiencyApp {
         console.log('📝 Task form hidden');
     }
 
-    saveNewTask() {
+    async saveNewTask() {
         const taskInput = document.getElementById('taskInput');
         const taskDeadline = document.getElementById('taskDeadline');
         const taskPriority = document.getElementById('taskPriority');
@@ -223,7 +236,7 @@ class EfficiencyApp {
         };
 
         this.tasks.push(task);
-        this.saveTasks();
+        await this.saveTasks();
         this.renderTasks();
         this.hideTaskForm();
 
@@ -282,11 +295,11 @@ class EfficiencyApp {
         `;
     }
 
-    completeTask(taskId) {
+    async completeTask(taskId) {
         const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.completed = true;
-            this.saveTasks();
+            await this.saveTasks();
             this.renderTasks();
             console.log('✅ Task completed:', task.text);
 
@@ -296,9 +309,9 @@ class EfficiencyApp {
         }
     }
 
-    deleteTask(taskId) {
+    async deleteTask(taskId) {
         this.tasks = this.tasks.filter(t => t.id !== taskId);
-        this.saveTasks();
+        await this.saveTasks();
         this.renderTasks();
         this.showNextUnprioritizedTask();
         console.log('🗑️ Task deleted:', taskId);
@@ -377,11 +390,11 @@ class EfficiencyApp {
         }
     }
 
-    assignPriority(taskId, priority) {
+    async assignPriority(taskId, priority) {
         const task = this.tasks.find(t => t.id === taskId);
         if (task) {
             task.priority = priority;
-            this.saveTasks();
+            await this.saveTasks();
             this.renderTasks();
             this.showNextUnprioritizedTask();
 
