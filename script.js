@@ -12,6 +12,7 @@ class EfficiencyApp {
     }
 
     init() {
+        console.log('🚀 App initialization started');
         this.loadTasks();
         this.setupEventListeners();
         this.renderTasks();
@@ -21,77 +22,138 @@ class EfficiencyApp {
         // Сообщаем MAX, что приложение готово
         if (window.WebApp) {
             window.WebApp.ready();
+            console.log('✅ MAX Bridge ready');
         }
+        
+        console.log('✅ App initialized successfully');
     }
 
     // Хранение задач
     loadTasks() {
-        if (window.WebApp && window.WebApp.DeviceStorage) {
-            const saved = window.WebApp.DeviceStorage.getItem('efficiency_tasks');
-            this.tasks = saved ? JSON.parse(saved) : [];
-        } else {
-            // Fallback для локального хранилища
-            const saved = localStorage.getItem('efficiency_tasks');
-            this.tasks = saved ? JSON.parse(saved) : [];
+        try {
+            let saved = null;
+            
+            if (window.WebApp && window.WebApp.DeviceStorage) {
+                // Для MAX Bridge
+                saved = window.WebApp.DeviceStorage.getItem('efficiency_tasks');
+                console.log('📦 Loaded from MAX Storage:', saved);
+            } else {
+                // Fallback для локального хранилища
+                saved = localStorage.getItem('efficiency_tasks');
+                console.log('📦 Loaded from Local Storage:', saved);
+            }
+            
+            if (saved && saved !== 'null' && saved !== 'undefined') {
+                this.tasks = JSON.parse(saved);
+                console.log('✅ Tasks loaded:', this.tasks.length);
+            } else {
+                this.tasks = [];
+                console.log('✅ No saved tasks, using empty array');
+            }
+        } catch (error) {
+            console.error('❌ Error loading tasks:', error);
+            this.tasks = [];
         }
     }
 
     saveTasks() {
-        const data = JSON.stringify(this.tasks);
-        if (window.WebApp && window.WebApp.DeviceStorage) {
-            window.WebApp.DeviceStorage.setItem('efficiency_tasks', data);
-        } else {
-            localStorage.setItem('efficiency_tasks', data);
+        try {
+            const data = JSON.stringify(this.tasks);
+            
+            if (window.WebApp && window.WebApp.DeviceStorage) {
+                window.WebApp.DeviceStorage.setItem('efficiency_tasks', data);
+                console.log('💾 Saved to MAX Storage');
+            } else {
+                localStorage.setItem('efficiency_tasks', data);
+                console.log('💾 Saved to Local Storage');
+            }
+        } catch (error) {
+            console.error('❌ Error saving tasks:', error);
         }
     }
 
     // Навигация
     setupEventListeners() {
+        console.log('🔧 Setting up event listeners');
+        
         // Переключение вкладок
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                console.log('🎯 Tab clicked:', e.target.dataset.tab);
                 this.switchTab(e.target.dataset.tab);
             });
         });
 
         // Чеклист
-        document.getElementById('addTaskBtn').addEventListener('click', () => {
-            this.showTaskForm();
-        });
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const saveTaskBtn = document.getElementById('saveTaskBtn');
+        const cancelTaskBtn = document.getElementById('cancelTaskBtn');
 
-        document.getElementById('saveTaskBtn').addEventListener('click', () => {
-            this.saveNewTask();
-        });
+        if (addTaskBtn) {
+            addTaskBtn.addEventListener('click', () => {
+                console.log('🎯 Add task button clicked');
+                this.showTaskForm();
+            });
+        }
 
-        document.getElementById('cancelTaskBtn').addEventListener('click', () => {
-            this.hideTaskForm();
-        });
+        if (saveTaskBtn) {
+            saveTaskBtn.addEventListener('click', () => {
+                console.log('🎯 Save task button clicked');
+                this.saveNewTask();
+            });
+        }
+
+        if (cancelTaskBtn) {
+            cancelTaskBtn.addEventListener('click', () => {
+                console.log('🎯 Cancel task button clicked');
+                this.hideTaskForm();
+            });
+        }
 
         // Помодоро таймер
-        document.getElementById('startTimerBtn').addEventListener('click', () => {
-            this.startTimer();
-        });
+        const startTimerBtn = document.getElementById('startTimerBtn');
+        const pauseTimerBtn = document.getElementById('pauseTimerBtn');
+        const resetTimerBtn = document.getElementById('resetTimerBtn');
+        const workTimeInput = document.getElementById('workTime');
 
-        document.getElementById('pauseTimerBtn').addEventListener('click', () => {
-            this.pauseTimer();
-        });
+        if (startTimerBtn) {
+            startTimerBtn.addEventListener('click', () => {
+                console.log('🎯 Start timer clicked');
+                this.startTimer();
+            });
+        }
 
-        document.getElementById('resetTimerBtn').addEventListener('click', () => {
-            this.resetTimer();
-        });
+        if (pauseTimerBtn) {
+            pauseTimerBtn.addEventListener('click', () => {
+                console.log('🎯 Pause timer clicked');
+                this.pauseTimer();
+            });
+        }
 
-        document.getElementById('workTime').addEventListener('change', (e) => {
-            if (!this.isTimerRunning) {
-                this.timerTime = parseInt(e.target.value) * 60;
-                this.updateTimerDisplay();
-            }
-        });
+        if (resetTimerBtn) {
+            resetTimerBtn.addEventListener('click', () => {
+                console.log('🎯 Reset timer clicked');
+                this.resetTimer();
+            });
+        }
+
+        if (workTimeInput) {
+            workTimeInput.addEventListener('change', (e) => {
+                if (!this.isTimerRunning) {
+                    this.timerTime = parseInt(e.target.value) * 60;
+                    this.updateTimerDisplay();
+                }
+            });
+        }
 
         // GTD свайпы
         this.setupSwipeEvents();
+        
+        console.log('✅ All event listeners set up');
     }
 
     switchTab(tabName) {
+        console.log('🔄 Switching to tab:', tabName);
         this.currentTab = tabName;
         
         // Обновляем активные кнопки
@@ -111,23 +173,45 @@ class EfficiencyApp {
 
     // Чеклист функционал
     showTaskForm() {
-        document.getElementById('taskForm').style.display = 'block';
-        document.getElementById('taskInput').focus();
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        
+        if (taskForm && taskInput) {
+            taskForm.style.display = 'block';
+            taskInput.focus();
+            console.log('📝 Task form shown');
+        }
     }
 
     hideTaskForm() {
-        document.getElementById('taskForm').style.display = 'none';
-        document.getElementById('taskInput').value = '';
-        document.getElementById('taskDeadline').value = '';
-        document.getElementById('taskPriority').value = '';
+        const taskForm = document.getElementById('taskForm');
+        const taskInput = document.getElementById('taskInput');
+        const taskDeadline = document.getElementById('taskDeadline');
+        const taskPriority = document.getElementById('taskPriority');
+        
+        if (taskForm) taskForm.style.display = 'none';
+        if (taskInput) taskInput.value = '';
+        if (taskDeadline) taskDeadline.value = '';
+        if (taskPriority) taskPriority.value = '';
+        
+        console.log('📝 Task form hidden');
     }
 
     saveNewTask() {
-        const text = document.getElementById('taskInput').value.trim();
-        const deadline = document.getElementById('taskDeadline').value;
-        const priority = document.getElementById('taskPriority').value;
+        const taskInput = document.getElementById('taskInput');
+        const taskDeadline = document.getElementById('taskDeadline');
+        const taskPriority = document.getElementById('taskPriority');
 
-        if (!text) return;
+        if (!taskInput) return;
+
+        const text = taskInput.value.trim();
+        const deadline = taskDeadline ? taskDeadline.value : '';
+        const priority = taskPriority ? taskPriority.value : '';
+
+        if (!text) {
+            console.log('⚠️ Task text is empty');
+            return;
+        }
 
         const task = {
             id: Date.now(),
@@ -143,6 +227,8 @@ class EfficiencyApp {
         this.renderTasks();
         this.hideTaskForm();
 
+        console.log('✅ New task saved:', task.text);
+
         // Вибрация при успешном добавлении
         if (window.WebApp && window.WebApp.HapticFeedback) {
             window.WebApp.HapticFeedback.impactOccurred('light');
@@ -151,6 +237,11 @@ class EfficiencyApp {
 
     renderTasks() {
         const tasksList = document.getElementById('tasksList');
+        if (!tasksList) {
+            console.log('❌ Tasks list container not found');
+            return;
+        }
+
         const uncompletedTasks = this.tasks.filter(task => !task.completed);
         const completedTasks = this.tasks.filter(task => task.completed);
 
@@ -170,9 +261,7 @@ class EfficiencyApp {
         }
 
         tasksList.innerHTML = html || '<p class="no-tasks">Задач пока нет</p>';
-
-        // Добавляем обработчики для новых элементов
-        this.attachTaskEventListeners();
+        console.log('✅ Tasks rendered:', this.tasks.length);
     }
 
     renderTaskItem(task) {
@@ -186,15 +275,11 @@ class EfficiencyApp {
                     <div class="task-deadline">${deadline}</div>
                 </div>
                 <div class="task-actions">
-                    ${!task.completed ? `<button class="complete-btn" onclick="app.completeTask(${task.id})">✓</button>` : ''}
-                    <button class="delete-btn" onclick="app.deleteTask(${task.id})">×</button>
+                    ${!task.completed ? `<button class="complete-btn" data-task-id="${task.id}">✓</button>` : ''}
+                    <button class="delete-btn" data-task-id="${task.id}">×</button>
                 </div>
             </div>
         `;
-    }
-
-    attachTaskEventListeners() {
-        // Обработчики уже встроены в HTML через onclick
     }
 
     completeTask(taskId) {
@@ -203,6 +288,7 @@ class EfficiencyApp {
             task.completed = true;
             this.saveTasks();
             this.renderTasks();
+            console.log('✅ Task completed:', task.text);
 
             if (window.WebApp && window.WebApp.HapticFeedback) {
                 window.WebApp.HapticFeedback.notificationOccurred('success');
@@ -215,11 +301,17 @@ class EfficiencyApp {
         this.saveTasks();
         this.renderTasks();
         this.showNextUnprioritizedTask();
+        console.log('🗑️ Task deleted:', taskId);
     }
 
     // GTD функционал
     setupSwipeEvents() {
         const currentTaskEl = document.getElementById('currentTask');
+        if (!currentTaskEl) {
+            console.log('❌ Current task element not found');
+            return;
+        }
+
         let startX, startY;
 
         currentTaskEl.addEventListener('touchstart', (e) => {
@@ -252,12 +344,15 @@ class EfficiencyApp {
                     
                     if (priority) {
                         this.assignPriority(currentTask.id, priority);
+                        console.log('🎯 Priority assigned:', priority);
                     }
                 }
             }
             
             startX = startY = null;
         });
+        
+        console.log('✅ Swipe events set up');
     }
 
     getCurrentUnprioritizedTask() {
@@ -265,15 +360,18 @@ class EfficiencyApp {
     }
 
     showNextUnprioritizedTask() {
-        const currentTask = this.getCurrentUnprioritizedTask();
         const currentTaskEl = document.getElementById('currentTask');
+        if (!currentTaskEl) return;
+
+        const currentTask = this.getCurrentUnprioritizedTask();
         
         if (currentTask) {
             currentTaskEl.innerHTML = `
                 <div class="task-card">${currentTask.text}</div>
                 <div class="swipe-hint">Свайпните в нужный угол для приоритета</div>
             `;
-            document.getElementById('noTasksMessage').style.display = 'none';
+            const noTasksMessage = document.getElementById('noTasksMessage');
+            if (noTasksMessage) noTasksMessage.style.display = 'none';
         } else {
             currentTaskEl.innerHTML = '<p id="noTasksMessage">Все задачи расставлены! 🎉</p>';
         }
@@ -299,8 +397,11 @@ class EfficiencyApp {
         if (this.isTimerRunning) return;
         
         this.isTimerRunning = true;
-        document.getElementById('startTimerBtn').disabled = true;
-        document.getElementById('pauseTimerBtn').disabled = false;
+        const startBtn = document.getElementById('startTimerBtn');
+        const pauseBtn = document.getElementById('pauseTimerBtn');
+        
+        if (startBtn) startBtn.disabled = true;
+        if (pauseBtn) pauseBtn.disabled = false;
 
         this.timerInterval = setInterval(() => {
             this.timerTime--;
@@ -310,36 +411,55 @@ class EfficiencyApp {
                 this.timerComplete();
             }
         }, 1000);
+        
+        console.log('⏰ Timer started');
     }
 
     pauseTimer() {
         this.isTimerRunning = false;
         clearInterval(this.timerInterval);
-        document.getElementById('startTimerBtn').disabled = false;
-        document.getElementById('pauseTimerBtn').disabled = true;
+        
+        const startBtn = document.getElementById('startTimerBtn');
+        const pauseBtn = document.getElementById('pauseTimerBtn');
+        
+        if (startBtn) startBtn.disabled = false;
+        if (pauseBtn) pauseBtn.disabled = true;
+        
+        console.log('⏰ Timer paused');
     }
 
     resetTimer() {
         this.pauseTimer();
-        const workTime = parseInt(document.getElementById('workTime').value);
+        const workTimeInput = document.getElementById('workTime');
+        const workTime = workTimeInput ? parseInt(workTimeInput.value) : 25;
+        
         this.timerTime = workTime * 60;
         this.isBreakTime = false;
         this.updateTimerDisplay();
+        
+        console.log('⏰ Timer reset');
     }
 
     timerComplete() {
         this.pauseTimer();
         this.sessionsCount++;
-        document.getElementById('sessionsCount').textContent = this.sessionsCount;
+        
+        const sessionsCountEl = document.getElementById('sessionsCount');
+        if (sessionsCountEl) sessionsCountEl.textContent = this.sessionsCount;
 
         // Переключаем между работой и отдыхом
         this.isBreakTime = !this.isBreakTime;
-        const time = this.isBreakTime ? 
-            parseInt(document.getElementById('breakTime').value) : 
-            parseInt(document.getElementById('workTime').value);
+        const workTimeInput = document.getElementById('workTime');
+        const breakTimeInput = document.getElementById('breakTime');
         
+        const workTime = workTimeInput ? parseInt(workTimeInput.value) : 25;
+        const breakTime = breakTimeInput ? parseInt(breakTimeInput.value) : 5;
+        
+        const time = this.isBreakTime ? breakTime : workTime;
         this.timerTime = time * 60;
         this.updateTimerDisplay();
+
+        console.log('⏰ Timer complete, sessions:', this.sessionsCount);
 
         // Уведомление
         if (window.WebApp && window.WebApp.HapticFeedback) {
@@ -356,14 +476,42 @@ class EfficiencyApp {
         const minutes = Math.floor(this.timerTime / 60).toString().padStart(2, '0');
         const seconds = (this.timerTime % 60).toString().padStart(2, '0');
         
-        document.getElementById('timerMinutes').textContent = minutes;
-        document.getElementById('timerSeconds').textContent = seconds;
+        const minutesEl = document.getElementById('timerMinutes');
+        const secondsEl = document.getElementById('timerSeconds');
+        
+        if (minutesEl) minutesEl.textContent = minutes;
+        if (secondsEl) secondsEl.textContent = seconds;
 
         // Изменяем цвет в зависимости от режима
-        const display = document.getElementById('timerMinutes').parentElement;
-        display.style.color = this.isBreakTime ? '#28a745' : '#dc3545';
+        const display = minutesEl ? minutesEl.parentElement : null;
+        if (display) {
+            display.style.color = this.isBreakTime ? '#28a745' : '#dc3545';
+        }
     }
 }
 
-// Инициализация приложения
-const app = new EfficiencyApp();
+// Глобальные обработчики для кнопок задач
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('complete-btn')) {
+        const taskId = parseInt(e.target.getAttribute('data-task-id'));
+        app.completeTask(taskId);
+    } else if (e.target.classList.contains('delete-btn')) {
+        const taskId = parseInt(e.target.getAttribute('data-task-id'));
+        app.deleteTask(taskId);
+    }
+});
+
+// Инициализация приложения когда DOM готов
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 DOM fully loaded');
+    window.app = new EfficiencyApp();
+});
+
+// Fallback на случай если DOM уже загружен
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+        window.app = new EfficiencyApp();
+    });
+} else {
+    window.app = new EfficiencyApp();
+}
