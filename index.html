@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Эффективность MAX</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://st.max.ru/js/max-web-app.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Навигация -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="checklist">Чеклист</button>
+            <button class="tab-btn" data-tab="gtd">GTD</button>
+            <button class="tab-btn" data-tab="pomodoro">Помодоро</button>
+        </nav>
+
+        <!-- Чеклист -->
+        <div id="checklist" class="tab-content active">
+            <div class="header">
+                <h2>Мои задачи</h2>
+                <button class="add-btn" id="addTaskBtn">+</button>
+            </div>
+            
+            <div class="task-form" id="taskForm" style="display: none;">
+                <input type="text" id="taskInput" placeholder="Новая задача...">
+                <input type="datetime-local" id="taskDeadline">
+                <select id="taskPriority">
+                    <option value="">Без приоритета</option>
+                    <option value="important-urgent">Важно и срочно</option>
+                    <option value="important-not-urgent">Важно, но не срочно</option>
+                    <option value="urgent-not-important">Срочно, но не важно</option>
+                    <option value="not-important-not-urgent">Не срочно и не важно</option>
+                </select>
+                <div class="form-actions">
+                    <button id="saveTaskBtn">Сохранить</button>
+                    <button id="cancelTaskBtn">Отмена</button>
+                </div>
+            </div>
+
+            <div class="tasks-list" id="tasksList">
+                <!-- задачи будут здесь -->
+            </div>
+        </div>
+
+        <!-- GTD расстановка приоритетов -->
+        <div id="gtd" class="tab-content">
+            <div class="gtd-container">
+                <div class="gtd-quadrants">
+                    <div class="quadrant top-left" data-priority="important-urgent">
+                        <span>Важно и срочно</span>
+                    </div>
+                    <div class="quadrant top-right" data-priority="important-not-urgent">
+                        <span>Важно, но не срочно</span>
+                    </div>
+                    <div class="quadrant bottom-left" data-priority="urgent-not-important">
+                        <span>Срочно, но не важно</span>
+                    </div>
+                    <div class="quadrant bottom-right" data-priority="not-important-not-urgent">
+                        <span>Не срочно и не важно</span>
+                    </div>
+                </div>
+                
+                <div class="current-task" id="currentTask">
+                    <p id="noTasksMessage">Все задачи расставлены! 🎉</p>
+                    <!-- текущая задача будет здесь -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Помодоро таймер -->
+        <div id="pomodoro" class="tab-content">
+            <div class="pomodoro-container">
+                <div class="timer-display">
+                    <span id="timerMinutes">25</span>:<span id="timerSeconds">00</span>
+                </div>
+                
+                <div class="timer-controls">
+                    <button id="startTimerBtn">Старт</button>
+                    <button id="pauseTimerBtn" disabled>Пауза</button>
+                    <button id="resetTimerBtn">Сброс</button>
+                </div>
+                
+                <div class="timer-settings">
+                    <label>
+                        Работа: 
+                        <input type="number" id="workTime" value="25" min="1">
+                    </label>
+                    <label>
+                        Отдых: 
+                        <input type="number" id="breakTime" value="5" min="1">
+                    </label>
+                </div>
+                
+                <div class="pomodoro-stats">
+                    <p>Сессий завершено: <span id="sessionsCount">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
